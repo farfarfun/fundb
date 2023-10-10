@@ -1,1 +1,0 @@
-funbuild build
