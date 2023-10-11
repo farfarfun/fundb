@@ -26,7 +26,7 @@ class JSONStorage:
         response = requests.delete(url, headers=headers)
         return response.json()
 
-    def create(self, api_key, data, security_key=None, private=False):
+    def create(self, api_key, data, security_key=None, private='false'):
         url = f"{self.base_url}/bin"
         headers = {"Api-key": api_key, "Security-key": security_key, "Private": private}
         response = requests.post(url, headers=headers, data=data)
