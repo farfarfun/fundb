@@ -3,8 +3,8 @@ requires = [ "poetry-core",]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "fundb"
-version = "1.2.1"
+name = "farfundb"
+version = "1.2.2"
 description = ""
 authors = [ "farfun <1007530194@qq.com>",]
 readme = "README.md"
