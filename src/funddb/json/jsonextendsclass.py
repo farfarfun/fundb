@@ -1,6 +1,7 @@
 """
 https://extendsclass.com/json-storage.openapi.json
 """
+
 import json
 
 import requests
@@ -28,7 +29,7 @@ class JSONStorage:
         response = requests.delete(url, headers=headers)
         return response.json()
 
-    def create(self, api_key, data, security_key=None, private='false'):
+    def create(self, api_key, data, security_key=None, private="false"):
         url = f"{self.base_url}/bin"
         headers = {"Api-key": api_key, "Security-key": security_key, "Private": private}
         response = requests.post(url, headers=headers, data=json.dumps(data))
