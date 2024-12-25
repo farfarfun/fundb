@@ -1,10 +1,10 @@
 [project]
 name = "funorm"
-version = "1.0.2"
+version = "1.0.3"
 description = "funddb"
 readme = "README.md"
 requires-python = ">=3.7"
-dependencies = [ "sqlalchemy>=2.0.36",]
+dependencies = [ "funutil>=1.0.19", "sqlalchemy>=2.0.36",]
 [[project.authors]]
 name = "niuliangtao"
 email = "farfarfun@qq.com"

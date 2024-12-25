@@ -1,11 +1,11 @@
-import logging
-
 import pandas as pd
-from sqlalchemy import delete, Engine, UniqueConstraint, BIGINT
+from funutil import getLogger
+from sqlalchemy import BIGINT, Engine, UniqueConstraint, delete
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, mapped_column
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import DeclarativeBase, Session, mapped_column, sessionmaker
 from sqlalchemy.sql import Insert
+
+logger = getLogger("fundb")
 
 
 @compiles(Insert, "sqlite")
@@ -71,7 +71,7 @@ class BaseTable:
                 session.bulk_insert_mappings(self.table, values)
                 session.commit()
             except Exception as ex:
-                logging.warning(ex)
+                logger.warning(ex)
                 session.rollback()
 
     def update(self, values):
@@ -81,7 +81,7 @@ class BaseTable:
                 session.bulk_update_mappings(self.table, values)
                 session.commit()
             except Exception as ex:
-                logging.warning(ex)
+                logger.warning(ex)
                 session.rollback()
 
     def upsert(self, values):
