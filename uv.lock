@@ -2,8 +2,8 @@ version = 1
 requires-python = ">=3.7"
 
 [[package]]
-name = "funddb"
-version = "1.2.11"
+name = "funorm"
+version = "1.0.2"
 source = { virtual = "." }
 dependencies = [
     { name = "sqlalchemy" },
