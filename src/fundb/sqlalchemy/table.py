@@ -21,9 +21,6 @@ class BaseTable(DeclarativeBase):
     gmt_create: Mapped[datetime] = mapped_column(
         comment="创建时间", default=datetime.now
     )
-    id: Mapped[int] = mapped_column(
-        primary_key=True, comment="主键", autoincrement=True
-    )
 
     def _get_uid(self) -> str:
         raise NotImplementedError
