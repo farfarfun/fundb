@@ -68,6 +68,7 @@ class BaseTable(DeclarativeBase):
         except Exception as e:
             logger.error(f"upsert error: {e}:{traceback.format_exc()}")
 
+    @staticmethod
     @disk_cache(cache_key="table", expire=600)
-    def select_all(self, session: Session, table):
+    def select_all(session: Session, table):
         return [resource for resource in session.execute(select(table)).scalars()]
