@@ -1,3 +1,4 @@
+import traceback
 from datetime import datetime
 
 from funutil import getLogger
@@ -8,22 +9,13 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 logger = getLogger("fundb")
 
 
-def get(c):
-    print(c)
-
-
 class BaseTable(DeclarativeBase):
-    id: Mapped[int] = mapped_column(
-        primary_key=True, comment="主键", autoincrement=True
-    )
-    gmt_create: Mapped[datetime] = mapped_column(
-        comment="创建时间", default=datetime.now
-    )
-    gmt_update: Mapped[datetime] = mapped_column(
-        comment="修改时间", default=datetime.now, onupdate=datetime.now
-    )
-
     uid: Mapped[str] = mapped_column(String(128), comment="唯一ID", unique=True)
+
+    gmt_modified: Mapped[datetime] = mapped_column(comment="修改时间", default=datetime.now, onupdate=datetime.now)
+
+    gmt_create: Mapped[datetime] = mapped_column(comment="创建时间", default=datetime.now)
+    id: Mapped[int] = mapped_column(primary_key=True, comment="主键", autoincrement=True)
 
     @property
     def get_uid(self):
@@ -55,11 +47,12 @@ class BaseTable(DeclarativeBase):
         return session.execute(sql).first() is not None
 
     def upsert(self, session: Session, update_data=False):
-        if not self.exists(session):
-            session.execute(insert(self.child()).values(**self._to_dict()))
-        elif update_data:
-            session.execute(
-                update(self.child())
-                .where(self.child().uid == self.uid)
-                .values(**self._to_dict())
-            )
+        try:
+            if not self.exists(session):
+                logger.debug(f"uid={self.uid} not exists, insert it.")
+                session.execute(insert(self.child()).values(**self._to_dict()))
+            elif update_data:
+                logger.debug(f"uid={self.uid} exists, update it.")
+                session.execute(update(self.child()).where(self.child().uid == self.uid).values(**self._to_dict()))
+        except Exception as e:
+            logger.error(f"upsert error: {e}:{traceback.format_exc()}")
