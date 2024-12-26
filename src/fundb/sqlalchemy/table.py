@@ -12,10 +12,16 @@ logger = getLogger("fundb")
 class BaseTable(DeclarativeBase):
     uid: Mapped[str] = mapped_column(String(128), comment="唯一ID", unique=True)
 
-    gmt_modified: Mapped[datetime] = mapped_column(comment="修改时间", default=datetime.now, onupdate=datetime.now)
+    gmt_modified: Mapped[datetime] = mapped_column(
+        comment="修改时间", default=datetime.now, onupdate=datetime.now
+    )
 
-    gmt_create: Mapped[datetime] = mapped_column(comment="创建时间", default=datetime.now)
-    id: Mapped[int] = mapped_column(primary_key=True, comment="主键", autoincrement=True)
+    gmt_create: Mapped[datetime] = mapped_column(
+        comment="创建时间", default=datetime.now
+    )
+    id: Mapped[int] = mapped_column(
+        primary_key=True, comment="主键", autoincrement=True
+    )
 
     @property
     def get_uid(self):
@@ -53,6 +59,10 @@ class BaseTable(DeclarativeBase):
                 session.execute(insert(self.child()).values(**self._to_dict()))
             elif update_data:
                 logger.debug(f"uid={self.uid} exists, update it.")
-                session.execute(update(self.child()).where(self.child().uid == self.uid).values(**self._to_dict()))
+                session.execute(
+                    update(self.child())
+                    .where(self.child().uid == self.uid)
+                    .values(**self._to_dict())
+                )
         except Exception as e:
             logger.error(f"upsert error: {e}:{traceback.format_exc()}")
