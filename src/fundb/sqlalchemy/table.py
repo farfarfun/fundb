@@ -35,7 +35,7 @@ class BaseTable(DeclarativeBase):
         raise NotImplementedError
 
     def get_uid(self):
-        raise md5(self._get_uid().encode("utf-8")).hexdigest()
+        return md5(self._get_uid().encode("utf-8")).hexdigest()
 
     def to_dict(self) -> dict:
         res = self._to_dict()
