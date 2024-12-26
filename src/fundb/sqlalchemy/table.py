@@ -1,5 +1,6 @@
 import traceback
 from datetime import datetime
+from hashlib import md5
 
 from funutil import getLogger
 from sqlalchemy import String, select, update
@@ -23,7 +24,7 @@ class BaseTable(DeclarativeBase):
         primary_key=True, comment="主键", autoincrement=True
     )
 
-    def _get_uid(self):
+    def _get_uid(self) -> str:
         raise NotImplementedError
 
     def _to_dict(self) -> dict:
@@ -32,11 +33,14 @@ class BaseTable(DeclarativeBase):
     def _child(self):
         raise NotImplementedError
 
+    def get_uid(self):
+        raise md5(self._get_uid().encode("utf-8")).hexdigest()
+
     def to_dict(self) -> dict:
         res = self._to_dict()
         res.update(
             {
-                "uid": self._get_uid(),
+                "uid": self.get_uid(),
             }
         )
         for key in list(res.keys()):
