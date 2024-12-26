@@ -23,21 +23,20 @@ class BaseTable(DeclarativeBase):
         primary_key=True, comment="主键", autoincrement=True
     )
 
-    @property
-    def get_uid(self):
-        raise NotImplementedError
-
-    def to_dict(self) -> dict:
+    def _get_uid(self):
         raise NotImplementedError
 
     def _to_dict(self) -> dict:
-        res = self.to_dict()
+        raise NotImplementedError
+
+    def _child(self):
+        raise NotImplementedError
+
+    def to_dict(self) -> dict:
+        res = self._to_dict()
         res.update(
             {
-                # "id": self.id,
-                # "gmt_create": self.gmt_create,
-                # "gmt_update": self.gmt_update,
-                "uid": self.uid,
+                "uid": self._get_uid(),
             }
         )
         for key in list(res.keys()):
@@ -45,24 +44,21 @@ class BaseTable(DeclarativeBase):
                 res.pop(key)
         return res
 
-    def child(self):
-        return BaseTable
-
     def exists(self, session: Session):
-        sql = select(self.child()).where(self.child().uid == self.uid)
+        sql = select(self._child()).where(self._child().uid == self.uid)
         return session.execute(sql).first() is not None
 
     def upsert(self, session: Session, update_data=False):
         try:
             if not self.exists(session):
                 logger.debug(f"uid={self.uid} not exists, insert it.")
-                session.execute(insert(self.child()).values(**self._to_dict()))
+                session.execute(insert(self._child()).values(**self.to_dict()))
             elif update_data:
                 logger.debug(f"uid={self.uid} exists, update it.")
                 session.execute(
-                    update(self.child())
-                    .where(self.child().uid == self.uid)
-                    .values(**self._to_dict())
+                    update(self._child())
+                    .where(self._child().uid == self.uid)
+                    .values(**self.to_dict())
                 )
         except Exception as e:
             logger.error(f"upsert error: {e}:{traceback.format_exc()}")
