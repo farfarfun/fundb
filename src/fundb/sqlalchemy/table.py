@@ -12,7 +12,9 @@ logger = getLogger("fundb")
 
 
 class BaseTable(DeclarativeBase):
-    uid: Mapped[str] = mapped_column(String(128), comment="唯一ID", unique=True)
+    uid: Mapped[str] = mapped_column(
+        String(128), primary_key=True, comment="唯一ID", unique=True
+    )
 
     gmt_modified: Mapped[datetime] = mapped_column(
         comment="修改时间", default=datetime.now, onupdate=datetime.now
