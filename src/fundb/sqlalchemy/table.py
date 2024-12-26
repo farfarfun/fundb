@@ -3,6 +3,7 @@ from datetime import datetime
 from hashlib import md5
 
 from funutil import getLogger
+from funutil.cache import disk_cache
 from sqlalchemy import String, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
@@ -33,8 +34,8 @@ class BaseTable(DeclarativeBase):
     def _child(self):
         raise NotImplementedError
 
-    def get_uid(self) -> str:
-        return md5(self._get_uid().encode("utf-8")).hexdigest()
+    def get_uid(self):
+        raise md5(self._get_uid().encode("utf-8")).hexdigest()
 
     def to_dict(self) -> dict:
         res = self._to_dict()
@@ -66,3 +67,7 @@ class BaseTable(DeclarativeBase):
                 )
         except Exception as e:
             logger.error(f"upsert error: {e}:{traceback.format_exc()}")
+
+    @disk_cache(cache_key="table", expire=600)
+    def select_all(self, session: Session, table):
+        return [resource for resource in session.execute(select(table)).scalars()]
