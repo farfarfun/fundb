@@ -13,16 +13,10 @@ logger = getLogger("fundb")
 class BaseTable(DeclarativeBase):
     uid: Mapped[str] = mapped_column(String(128), comment="唯一ID", unique=True)
 
-    gmt_modified: Mapped[datetime] = mapped_column(
-        comment="修改时间", default=datetime.now, onupdate=datetime.now
-    )
+    gmt_modified: Mapped[datetime] = mapped_column(comment="修改时间", default=datetime.now, onupdate=datetime.now)
 
-    gmt_create: Mapped[datetime] = mapped_column(
-        comment="创建时间", default=datetime.now
-    )
-    id: Mapped[int] = mapped_column(
-        primary_key=True, comment="主键", autoincrement=True
-    )
+    gmt_create: Mapped[datetime] = mapped_column(comment="创建时间", default=datetime.now)
+    id: Mapped[int] = mapped_column(primary_key=True, comment="主键", autoincrement=True)
 
     def _get_uid(self) -> str:
         raise NotImplementedError
@@ -33,8 +27,8 @@ class BaseTable(DeclarativeBase):
     def _child(self):
         raise NotImplementedError
 
-    def get_uid(self):
-        raise md5(self._get_uid().encode("utf-8")).hexdigest()
+    def get_uid(self) -> str:
+        return md5(self._get_uid().encode("utf-8")).hexdigest()
 
     def to_dict(self) -> dict:
         res = self._to_dict()
@@ -59,10 +53,6 @@ class BaseTable(DeclarativeBase):
                 session.execute(insert(self._child()).values(**self.to_dict()))
             elif update_data:
                 logger.debug(f"uid={self.uid} exists, update it.")
-                session.execute(
-                    update(self._child())
-                    .where(self._child().uid == self.uid)
-                    .values(**self.to_dict())
-                )
+                session.execute(update(self._child()).where(self._child().uid == self.uid).values(**self.to_dict()))
         except Exception as e:
             logger.error(f"upsert error: {e}:{traceback.format_exc()}")
